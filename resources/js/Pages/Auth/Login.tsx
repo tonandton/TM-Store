@@ -112,6 +112,3 @@ export default function Login({
         </AuthenticatedLayout>
     );
 }
-
-
-// 1.07.51
