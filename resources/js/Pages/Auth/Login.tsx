@@ -32,7 +32,15 @@ export default function Login({
         <AuthenticatedLayout>
             <Head title="Log in" />
 
-            <div className={"p-16"}>
+            <div className={"p-10"}>
+                <div className="card bg-white shadow max-w-[420px] mx-auto">
+                    <div className="card-body">
+
+                    </div>
+                </div>
+            </div>
+
+            <div className={"p-10"}>
                 <div className="card bg-white shadow max-w-[420px] mx-auto">
                     <div className="card-body">
                         {status && (
