@@ -19,6 +19,6 @@ class EditDepartment extends EditRecord
 
     protected function getRedirectUrl(): string
     {
-        return $this->getResource()::getUrl('inex');
+        return $this->getResource()::getUrl('index');
     }
 }
