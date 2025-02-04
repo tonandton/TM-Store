@@ -39,11 +39,11 @@ class ProductResource extends Resource
                             ->live(onBlur: true)
                             ->required()
                             ->afterStateUpdated(
-                                function (string $opration, $state, callable $set) {
+                                function ($state, callable $set) {
                                     $set('slug', Str::slug($state));
                                 }
                             ),
-                        TextInput::male('slug')
+                        TextInput::make('slug')
                             ->required(),
                         Select::make('department_id')
                             ->relationship('department', 'name')
