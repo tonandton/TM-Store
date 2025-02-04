@@ -111,7 +111,8 @@ class ProductResource extends Resource
                     ->searchable(),
                 TextColumn::make('status')
                     ->badge()
-                    ->color(ProductStatusEnum::colors()),
+                    // ->color(ProductStatusEnum::colors()),
+                    ->color(fn($state) => ProductStatusEnum::colors()[$state] ?? 'gray'),
                 TextColumn::make('department.name'),
                 TextColumn::make('category.name'),
                 TextColumn::make('created_at')
