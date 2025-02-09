@@ -129,6 +129,8 @@ class ProductResource extends Resource
                 TextColumn::make('department.name'),
                 TextColumn::make('category.name'),
                 TextColumn::make('created_at')
+                    ->dateTime(),
+                TextColumn::make('updated_at')
                     ->dateTime()
             ])
             ->filters([
@@ -176,6 +178,6 @@ class ProductResource extends Resource
     public static function canViewAny(): bool
     {
         $user = Filament::auth()->user();
-        return  $user && $user->hasRole(RolesEnum::Vendor);
+        return  $user && $user->hasRole(RolesEnum::Vendor) || RolesEnum::Admin;
     }
 }
