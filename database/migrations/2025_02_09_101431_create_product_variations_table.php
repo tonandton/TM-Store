@@ -37,7 +37,9 @@ return new class extends Migration
                 ->constrained('products')
                 ->cascadeOndelete();
             $table->json('variation_type_option_ids');
-            $table->$table->timestamps();
+            $table->integer('quantity')->nullable();
+            $table->decimal('price', 20, 4)->nullable();
+            $table->timestamps();
         });
     }
 
