@@ -7,6 +7,7 @@ use App\ProductVariationTypeEnum;
 use Filament\Actions\DeleteAction;
 use Filament\Forms\Components\Actions;
 use Filament\Forms\Components\Repeater;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Filament\Forms\Components\TextInput;
@@ -23,8 +24,38 @@ class ProductVariations extends EditRecord
 
        public function form(Form $form): Form
        {
+              $types = $this->record->variationTypes;
+              $fields = [];
+
+              foreach ($types as $type) {
+                     $fields[] = TextInput::make('variation_type_' . ($type->id) . '.id')
+                            ->hidden();
+
+                     $fields[] = TextInput::make('variation_type_' . ($type->id) . '.name')
+                            ->label($type->name);
+              }
+
               return $form
-                     ->schema([]);
+                     ->schema([
+                            Repeater::make('variations')
+                                   ->label(false)
+                                   ->collapsible()
+                                   ->addable(false)
+                                   ->defaultItems(1)
+                                   ->schema([
+                                          Section::make()
+                                                 ->schema($fields)
+                                                 ->columns(3),
+                                          TextInput::make('quan tity')
+                                                 ->label('Quantity')
+                                                 ->numeric(),
+                                          TextInput::make('price')
+                                                 ->label('Price')
+                                                 ->numeric()
+                                   ])
+                                   ->columns(2)
+                                   ->columnSpan(2)
+                     ]);
        }
 
        protected function getHeaderActions(): array
@@ -44,9 +75,9 @@ class ProductVariations extends EditRecord
 
        private function mergeCartesianWithExisting($variationTypes, $existingData): array
        {
-              $defaultQuanTity = $this->record->quantity;
+              $defaultQuantity = $this->record->quantity;
               $defaultPrice = $this->record->price;
-              $cartesianProduct = $this->cartesianProduct($variationTypes, $defaultQuanTity);
+              $cartesianProduct = $this->cartesianProduct($variationTypes, $defaultQuantity);
               $mergedResult = [];
 
               foreach ($cartesianProduct as $product) {
@@ -70,8 +101,8 @@ class ProductVariations extends EditRecord
                             $product['price'] = $existingEntry['price'];
                      } else {
                             // Set default quantity and price if no match
-                            $product['quantity'] = $defaultQuanTity;
-                            $product['price'] = $defaultPrice;
+                            $product['quantity'] = $defaultQuantity;
+                            $product['price'] = $defaultPrice;;
                      }
 
                      $mergedResult[] = $product;
@@ -80,7 +111,7 @@ class ProductVariations extends EditRecord
               return $mergedResult;
        }
 
-       private function cartesianProduct($variationTypes, $defaultQuanTity = null): array
+       private function cartesianProduct($variationTypes, $defaultQuantity = null, $defaultPrice = null): array
        {
               $result = [[]];
 
@@ -104,5 +135,28 @@ class ProductVariations extends EditRecord
 
                      $result = $temp; // Update results with the new combination 
               }
+
+              // Add quantity and price to completed combinations
+              foreach ($result as &$combination) {
+                     if (count($combination) === count($variationTypes)) {
+                            $combination['quantity'] = $defaultQuantity;
+                            $combination['price'] = $defaultPrice;
+                     }
+              }
+
+              return $result;
+       }
+
+       protected function mutateFormDataBeforeSave(array $data): array
+       {
+              // Initialize an array to hold the formatted data
+              $formattedData = [];
+
+              // Loop through each variation to restructure it 
+              foreach ($data['variations'] as $option) {
+                     $variationTypeOptionIds = [];
+              }
+
+              return $data;
        }
 }
