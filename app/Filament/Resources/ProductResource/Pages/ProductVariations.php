@@ -14,6 +14,8 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Resources\Pages\EditRecord;
 use Filament\Tables\Actions\Action;
+use Illuminate\Database\Eloquent\Model;
+
 
 class ProductVariations extends EditRecord
 {
@@ -46,7 +48,7 @@ class ProductVariations extends EditRecord
                                           Section::make()
                                                  ->schema($fields)
                                                  ->columns(3),
-                                          TextInput::make('quan tity')
+                                          TextInput::make('quantity')
                                                  ->label('Quantity')
                                                  ->numeric(),
                                           TextInput::make('price')
@@ -97,6 +99,7 @@ class ProductVariations extends EditRecord
                      // If match found overide quantity and price
                      if (!empty($match)) {
                             $existingEntry = reset($match);
+                            $product['id'] = $existingEntry['id'];
                             $product['quantity'] = $existingEntry['quantity'];
                             $product['price'] = $existingEntry['price'];
                      } else {
@@ -155,8 +158,47 @@ class ProductVariations extends EditRecord
               // Loop through each variation to restructure it 
               foreach ($data['variations'] as $option) {
                      $variationTypeOptionIds = [];
+
+                     foreach ($this->record->variationTypes as $i => $variationType) {
+                            $variationTypeOptionIds[] = $option['variation_type_' . ($variationType->id)]['id'];
+                     }
+
+                     $quantity = $option['quantity'];
+                     $price = $option['price'];
+
+                     // Prepare the data structure for the database
+                     $formattedData[] = [
+                            'id' => $option['id'],
+                            'variation_type_option_ids' => $variationTypeOptionIds,
+                            'quantity' => $quantity,
+                            'price' => $price,
+                     ];
               }
 
+              $data['variations'] = $formattedData;
+
               return $data;
+       }
+
+       protected function handleRecordUpdate(Model $record, array $data): Model
+       {
+              $variations = $data['variations'];
+              unset($data['variations']);
+
+              $variations = collect($variations)
+                     ->map(function ($variation) {
+                            return [
+                                   'id' => $variation['id'],
+                                   'variation_type_option_ids' => json_encode($variation['variation_type_option_ids']),
+                                   'quantity' => $variation['quantity'],
+                                   'price' => $variation['price'],
+                            ];
+                     })
+                     ->toArray();
+
+              $record->variations()->delete();
+              $record->variations()->upsert($variations, ['id'], ['variation_type_option_ids', 'quantity', 'price']);
+
+              return $record;
        }
 }
