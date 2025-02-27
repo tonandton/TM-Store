@@ -38,9 +38,9 @@ class ProductResource extends JsonResource
             ],
             'department' => [
                 'id' => $this->department->id,
-                'name' => $this->partment->name
+                'name' => $this->department->name
             ],
-            'variationType' => $this->variationType->map(function($variationType) {
+            'variationType' => collect($this->variationType ?? [])->map(function ($variationType) {
                 return [
                     'id' => $variationType->id,
                     'name' => $variationType->name,
@@ -50,12 +50,25 @@ class ProductResource extends JsonResource
                             'id' => $option->id,
                             'name' => $option->name,
                             'images' => $option->getMedia('images')->map(function ($image) {
-                                return[]
+                                return [
+                                    'id' => $image->id,
+                                    'thumb' => $image->getUrl('thumb'),
+                                    'small' => $image->getUrl('small'),
+                                    'large' => $image->getUrl('large')
+                                ];
                             })
                         ];
-                     })
+                    })
                 ];
             }),
+            'variations' => $this->variations->map(function ($variation) {
+                return [
+                    'id' => $variation->id,
+                    'variation_type_option_ids' => $variation->variation_type_option_ids,
+                    'quantity' => $variation->quantity,
+                    'price' => $variation->price,
+                ];
+            })
         ];
     }
 }

@@ -3,7 +3,7 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { PageProps, PagiantionProps, Product } from '@/types';
 import { Head, Link } from '@inertiajs/react';
 
-export default function Welcome({
+export default function Home({
     products
 }: PageProps<{ products: PagiantionProps<Product> }>) {
 
@@ -11,7 +11,7 @@ export default function Welcome({
 
     return (
         <AuthenticatedLayout>
-            <Head title="Welcome" />
+            <Head title="Home" />
             <div
                 className="hero min-h-screen"
                 style={{
